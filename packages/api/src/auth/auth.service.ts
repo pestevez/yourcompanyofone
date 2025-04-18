@@ -14,7 +14,13 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: { organization: true },
+      include: {
+        organizations: {
+          include: {
+            organization: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -38,7 +44,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      organizationId: user.organizationId,
+      organizationId: user.organizations[0].organization.id,
     };
 
     return {
@@ -55,19 +61,27 @@ export class AuthService {
         password: hashedPassword,
         name,
         authProvider: AuthProvider.EMAIL_PASSWORD,
-        organization: {
+        organizations: {
           create: {
-            name: `${name}'s Organization`,
-            plan: {
-              connect: {
-                name: 'Free',
+            organization: {
+              create: {
+                name: `${name}'s Organization`,
+                plan: {
+                  connect: {
+                    name: 'Free',
+                  },
+                },
               },
             },
           },
         },
       },
       include: {
-        organization: true,
+        organizations: {
+          include: {
+            organization: true,
+          },
+        },
       },
     });
 
