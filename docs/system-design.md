@@ -221,10 +221,44 @@ packages/
 ## Core Components
 
 ### 1. Authentication Service
-- User authentication
-- Organization identity provider management
-- OAuth integration
-- JWT token management
+
+#### Implementation Details
+- **Core Components**:
+  - `AuthService`: Handles authentication logic and user management
+  - `AuthController`: Exposes authentication endpoints
+  - `JwtStrategy`: Implements JWT-based authentication
+
+#### Features
+- **User Authentication**:
+  - Email/password authentication with bcrypt hashing
+  - JWT token generation with 1-day expiration
+  - Multiple auth provider support (Google, GitHub, Custom OAuth)
+  - Automatic organization creation during registration
+
+#### API Endpoints
+- **POST `/auth/login`**:
+  - Authenticates users with email/password
+  - Returns JWT access token
+  - Validates auth provider type
+  
+- **POST `/auth/register`**:
+  - Creates new user account
+  - Hashes password securely
+  - Creates organization automatically
+  - Assigns default 'Free' plan
+  - Returns JWT access token
+
+#### Security Measures
+- Password hashing using bcrypt
+- JWT token signing with environment-based secrets
+- Auth provider validation
+- Email verification support
+- Rate limiting on auth endpoints
+
+#### Organization Identity Management
+- Support for multiple auth providers per organization
+- Custom OAuth provider configuration
+- Secure credential storage
 - Role-based access control
 
 ### 2. Content Management
