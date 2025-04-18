@@ -203,6 +203,15 @@ interface Content {
 }
 ```
 
+### Test Data
+
+The database includes seed data for development and testing purposes. This includes:
+- Organization plans (Free and Paid) with different feature sets
+- Sample organizations with varying subscription levels
+- Test users with different roles (Admin and Member)
+
+For a complete overview of the test data and how to work with it, see the [Development Setup Guide](./development-setup.md#test-data-overview).
+
 ## API Design
 
 ### Authentication
@@ -338,4 +347,8 @@ inngest.createFunction(
 1. Marketplace for integrations
 2. Advanced AI features
 3. White-label solutions
-4. API for third-party developers 
+4. API for third-party developers
+
+## Development Environment
+
+For detailed instructions on setting up the development environment and working with test data, please refer to [Development Setup Guide](./development-setup.md). 
