@@ -5,13 +5,29 @@
 ### 1. Repository Structure
 ```
 yourcompanyofone/
-├── apps/
-│   ├── web/           # Next.js frontend
-│   └── api/           # NestJS backend
 ├── packages/
+│   ├── api/           # NestJS API application
+│   │   ├── src/       # Source code
+│   │   ├── test/      # Test configurations
+│   │   └── ...        # Configuration files
+│   │
 │   ├── database/      # Prisma schema and client
-│   ├── shared/        # Shared types and utilities
+│   │   ├── prisma/    # Schema and migrations
+│   │   ├── src/       # Database utilities
+│   │   └── ...        # Configuration files
+│   │
+│   ├── shared/        # Shared utilities and constants
+│   │   ├── src/       # Shared code
+│   │   └── ...        # Configuration files
+│   │
+│   ├── types/         # Shared TypeScript types
+│   │   ├── src/       # Type definitions
+│   │   └── ...        # Configuration files
+│   │
 │   └── workflows/     # Inngest workflows
+│       ├── src/       # Workflow definitions
+│       └── ...        # Configuration files
+│
 ├── docs/              # Documentation
 └── docker/            # Docker configurations
 ```

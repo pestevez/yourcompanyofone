@@ -4,13 +4,14 @@
 1. [System Overview](#system-overview)
 2. [Architecture](#architecture)
 3. [Technical Stack](#technical-stack)
-4. [Core Components](#core-components)
-5. [Database Schema](#database-schema)
-6. [API Design](#api-design)
-7. [Workflow Management](#workflow-management)
-8. [MVP Implementation Plan](#mvp-implementation-plan)
-9. [Security Considerations](#security-considerations)
-10. [Future Roadmap](#future-roadmap)
+4. [Package Structure](#package-structure)
+5. [Core Components](#core-components)
+6. [Database Schema](#database-schema)
+7. [API Design](#api-design)
+8. [Workflow Management](#workflow-management)
+9. [MVP Implementation Plan](#mvp-implementation-plan)
+10. [Security Considerations](#security-considerations)
+11. [Future Roadmap](#future-roadmap)
 
 ## System Overview
 
@@ -87,6 +88,69 @@ The system aims to provide an AI-powered platform for professional social media 
 - **Orchestration**: Kubernetes
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Prometheus + Grafana
+
+## Package Structure
+
+### Core Packages
+```
+packages/
+├── api/              # NestJS API application
+│   ├── src/          # Source code
+│   │   ├── app.module.ts
+│   │   ├── main.ts
+│   │   └── ...
+│   ├── test/         # Test configurations
+│   ├── package.json  # API dependencies
+│   └── tsconfig.json # TypeScript configuration
+│
+├── database/         # Database access layer
+│   ├── prisma/       # Prisma schema and migrations
+│   ├── src/          # Database client and utilities
+│   ├── package.json  # Database dependencies
+│   └── tsconfig.json # TypeScript configuration
+│
+├── shared/           # Shared utilities and constants
+│   ├── src/          # Shared code
+│   ├── package.json  # Shared dependencies
+│   └── tsconfig.json # TypeScript configuration
+│
+├── types/            # Shared TypeScript types
+│   ├── src/          # Type definitions
+│   ├── package.json  # Types dependencies
+│   └── tsconfig.json # TypeScript configuration
+│
+└── workflows/        # Inngest workflows
+    ├── src/          # Workflow definitions
+    ├── package.json  # Workflow dependencies
+    └── tsconfig.json # TypeScript configuration
+```
+
+### Package Dependencies
+- `@yourcompanyofone/api` depends on:
+  - `@yourcompanyofone/database`
+  - `@yourcompanyofone/types`
+  - `@yourcompanyofone/shared`
+- `@yourcompanyofone/database` depends on:
+  - `@yourcompanyofone/types`
+- `@yourcompanyofone/workflows` depends on:
+  - `@yourcompanyofone/database`
+  - `@yourcompanyofone/shared`
+
+### Development Setup
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Build packages:
+   ```bash
+   npm run build
+   ```
+
+3. Start development servers:
+   ```bash
+   npm run dev
+   ```
 
 ## Core Components
 
