@@ -1,0 +1,19 @@
+{
+  "name": "@yourcompanyofone/workflows",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "inngest": "^1.0.0",
+    "@yourcompanyofone/database": "workspace:*",
+    "@yourcompanyofone/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+} 
