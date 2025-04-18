@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  GOOGLE
+  GITHUB
+  CUSTOM_OAUTH
+  EMAIL_PASSWORD
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  password        String?  // Hashed password for email/password auth
+  emailVerified   DateTime?
+  image           String?
+  authProvider    AuthProvider @default(EMAIL_PASSWORD)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  organizations   OrganizationMember[]
+}
+
+model Organization {
+  id                    String   @id @default(cuid())
+  name                  String
+  planId                String
+  plan                  OrganizationPlan @relation(fields: [planId], references: [id])
+  identityProviderId    String?
+  identityProvider      OrganizationIdentityProvider? @relation(fields: [identityProviderId], references: [id])
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  members               OrganizationMember[]
+  platformIdentities    PlatformIdentity[]
+  content               Content[]
+}
+
+model OrganizationPlan {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  description   String
+  price         Float
+  features      Json     // Store plan features as JSON
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  organizations Organization[]
+}
+
+model OrganizationIdentityProvider {
+  id            String   @id @default(cuid())
+  type          AuthProvider
+  clientId      String?
+  clientSecret  String?  // Encrypted
+  config        Json     // Additional provider-specific configuration
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  organizations Organization[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String       @default("MEMBER")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model PlatformIdentity {
+  id             String       @id @default(cuid())
+  organizationId String
+  platform       String
+  credentials    Json
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  content        Content[]
+}
+
+model Content {
+  id                String           @id @default(cuid())
+  organizationId    String
+  creatorId         String
+  platformIdentityId String
+  content           Json
+  status            String           @default("DRAFT")
+  scheduledAt       DateTime?
+  publishedAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  organization      Organization     @relation(fields: [organizationId], references: [id])
+  platformIdentity  PlatformIdentity @relation(fields: [platformIdentityId], references: [id])
+} 

@@ -27,10 +27,17 @@ The system aims to provide an AI-powered platform for professional social media 
 3. Customizable Automation
    - Workflow configuration
    - Approval chains
+4. Flexible Authentication
+   - Multiple auth providers
+   - Organization-level identity management
+5. Plan Management
+   - Feature-based access control
+   - Flexible pricing
 
 ### Actors
 1. Content Creators
 2. Administrators
+3. Organization Owners
 
 ## Architecture
 
@@ -67,11 +74,13 @@ The system aims to provide an AI-powered platform for professional social media 
 - **ORM**: Prisma
 - **Cache/Queue**: Redis
 - **Workflow Engine**: Inngest
+- **Authentication**: OAuth 2.0, JWT
 
 ### Frontend
 - **Framework**: Next.js
 - **UI Library**: Tailwind CSS + Headless UI
 - **State Management**: React Query + Zustand
+- **Authentication**: NextAuth.js
 
 ### Infrastructure
 - **Containerization**: Docker
@@ -83,9 +92,10 @@ The system aims to provide an AI-powered platform for professional social media 
 
 ### 1. Authentication Service
 - User authentication
-- Organization management
-- Role-based access control
+- Organization identity provider management
 - OAuth integration
+- JWT token management
+- Role-based access control
 
 ### 2. Content Management
 - Content creation and storage
@@ -111,6 +121,12 @@ The system aims to provide an AI-powered platform for professional social media 
 - Trend detection
 - Reporting
 
+### 6. Plan Management
+- Feature-based access control
+- Plan upgrades/downgrades
+- Usage tracking
+- Billing integration
+
 ## Database Schema
 
 ### Core Tables
@@ -120,6 +136,10 @@ interface User {
   id: string;
   email: string;
   name: string;
+  password?: string;
+  emailVerified?: Date;
+  image?: string;
+  authProvider: AuthProvider;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -128,7 +148,32 @@ interface User {
 interface Organization {
   id: string;
   name: string;
+  planId: string;
   plan: OrganizationPlan;
+  identityProviderId?: string;
+  identityProvider?: OrganizationIdentityProvider;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Organization Plans
+interface OrganizationPlan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  features: any; // JSON
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Identity Providers
+interface OrganizationIdentityProvider {
+  id: string;
+  type: AuthProvider;
+  clientId?: string;
+  clientSecret?: string;
+  config: any; // JSON
   createdAt: Date;
   updatedAt: Date;
 }
@@ -137,8 +182,8 @@ interface Organization {
 interface PlatformIdentity {
   id: string;
   organizationId: string;
-  platform: Platform;
-  credentials: PlatformCredentials;
+  platform: string;
+  credentials: any; // JSON
   createdAt: Date;
   updatedAt: Date;
 }
@@ -148,9 +193,11 @@ interface Content {
   id: string;
   organizationId: string;
   creatorId: string;
-  content: any;
-  status: ContentStatus;
   platformIdentityId: string;
+  content: any; // JSON
+  status: string;
+  scheduledAt?: Date;
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -162,6 +209,7 @@ interface Content {
 ```typescript
 POST /auth/login
 POST /auth/register
+POST /auth/oauth/{provider}
 POST /auth/refresh
 ```
 
@@ -171,6 +219,15 @@ POST /organizations
 GET /organizations/:id
 GET /organizations/:id/members
 POST /organizations/:id/members
+PUT /organizations/:id/plan
+```
+
+### Identity Providers
+```typescript
+POST /organizations/:id/identity-providers
+GET /organizations/:id/identity-providers
+PUT /organizations/:id/identity-providers/:providerId
+DELETE /organizations/:id/identity-providers/:providerId
 ```
 
 ### Content
@@ -223,6 +280,7 @@ inngest.createFunction(
 - Database configuration
 - Authentication system
 - Basic organization management
+- Plan management
 
 ### Phase 2: Platform Integration (Week 3-4)
 - Twitter API integration
@@ -244,20 +302,23 @@ inngest.createFunction(
 
 ### Authentication
 - OAuth 2.0/OpenID Connect
-- JWT tokens
+- JWT tokens with refresh mechanism
 - Secure session management
 - MFA support
+- Organization-level identity provider configuration
 
 ### Data Protection
 - Encryption at rest
 - Secure API endpoints
 - Rate limiting
 - Audit logging
+- Secure credential storage
 
 ### Compliance
 - GDPR compliance
 - Data retention policies
 - Privacy controls
+- Secure credential management
 
 ## Future Roadmap
 
