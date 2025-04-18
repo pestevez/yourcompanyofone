@@ -12,6 +12,7 @@
 9. [MVP Implementation Plan](#mvp-implementation-plan)
 10. [Security Considerations](#security-considerations)
 11. [Future Roadmap](#future-roadmap)
+12. [Development Setup](#development-setup)
 
 ## System Overview
 
@@ -137,20 +138,85 @@ packages/
   - `@yourcompanyofone/shared`
 
 ### Development Setup
+
+#### Workspace Configuration
+The project uses npm workspaces for managing multiple packages. The workspace configuration is defined in the root `package.json`:
+
+```json
+{
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  }
+}
+```
+
+#### Package Management
+- All npm commands should be run from the root directory
+- Use `--workspace` flag to target specific packages
+- Example commands:
+  ```bash
+  # Install dependencies for all packages
+  npm install
+  
+  # Install dependencies for a specific package
+  npm install --workspace=packages/database
+  
+  # Build a specific package
+  npm run build --workspace=packages/database
+  ```
+
+#### Package Structure
+```
+packages/
+├── api/              # NestJS API application
+├── database/         # Prisma database package
+├── shared/          # Shared utilities and types
+└── workflows/       # Inngest workflows
+```
+
+#### Environment Setup
+1. Node.js >= 18.0.0
+2. npm >= 10.9.2
+3. Docker and Docker Compose for database
+4. Prisma CLI for database migrations
+
+#### Development Workflow
 1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Build packages:
+2. Start the database:
    ```bash
-   npm run build
+   npm run db:up
    ```
 
-3. Start development servers:
+3. Run database migrations:
    ```bash
-   npm run dev
+   npm run db:migrate
    ```
+
+4. Start development servers:
+   ```bash
+   # API development
+   npm run dev --workspace=packages/api
+   
+   # Database package development
+   npm run dev --workspace=packages/database
+   ```
+
+#### Package Dependencies
+- `@yourcompanyofone/database`: Prisma client and database access
+- `@yourcompanyofone/shared`: Common types and utilities
+- `@yourcompanyofone/workflows`: Inngest workflows and event handlers
+
+#### Build Process
+1. Each package has its own build configuration
+2. Packages are built independently
+3. Dependencies are managed through workspace references
+4. TypeScript configurations are package-specific
 
 ## Core Components
 
