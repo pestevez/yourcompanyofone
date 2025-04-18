@@ -7,18 +7,19 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "db:migrate": "prisma migrate deploy",
+    "db:migrate": "prisma migrate dev",
     "db:seed": "ts-node prisma/seed.ts",
-    "db:reset": "prisma migrate reset --force"
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2",
+    "@nestjs/common": "^11.0.20",
+    "@prisma/client": "^6.6.0",
     "@yourcompanyofone/types": "file:../types",
     "inngest": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
-    "prisma": "^5.10.2",
+    "@types/node": "^20.11.0",
+    "prisma": "^6.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
