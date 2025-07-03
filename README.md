@@ -19,20 +19,19 @@ An AI-powered platform for professional social media management.
 - **Workflow Engine**: Inngest
 - **Infrastructure**: Docker, Kubernetes
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- Docker
-- Docker Compose
-- Inngest CLI
+- Node.js >= 18.0.0
+- Docker Desktop
+- npm
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/yourcompanyofone.git
+   git clone https://github.com/pestevez/yourcompanyofone.git
    cd yourcompanyofone
    ```
 
@@ -41,17 +40,22 @@ An AI-powered platform for professional social media management.
    npm install
    ```
 
-3. Start the development environment:
+3. Start the database:
    ```bash
-   docker-compose up -d
+   npm run db:up --workspaces=false
    ```
 
 4. Run database migrations:
    ```bash
-   npm run db:migrate
+   npm run db:migrate --workspaces=false
    ```
 
-5. Start the development servers:
+5. Seed the database with test data:
+   ```bash
+   npm run db:seed --workspaces=false
+   ```
+
+6. Start the development servers:
    ```bash
    npm run dev
    ```
@@ -59,6 +63,8 @@ An AI-powered platform for professional social media management.
 The application will be available at:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:3001
+
+> 📖 **For detailed setup instructions, troubleshooting, and test data information, see [Development Setup Guide](docs/development-setup.md)**
 
 ## Development
 
@@ -72,6 +78,7 @@ yourcompanyofone/
 ├── packages/
 │   ├── database/      # Prisma schema and client
 │   ├── shared/        # Shared types and utilities
+│   ├── types/         # TypeScript type definitions
 │   └── workflows/     # Inngest workflows
 ├── docs/              # Documentation
 └── docker/            # Docker configurations
@@ -81,11 +88,20 @@ yourcompanyofone/
 
 - `npm run dev`: Start development servers
 - `npm run build`: Build all packages and apps
-- `npm run start`: Start production servers
-- `npm run lint`: Run linting
 - `npm run test`: Run tests
-- `npm run db:migrate`: Run database migrations
-- `npm run db:generate`: Generate Prisma client
+- `npm run db:up --workspaces=false`: Start PostgreSQL database
+- `npm run db:down --workspaces=false`: Stop PostgreSQL database
+- `npm run db:reset --workspaces=false`: Reset database (drops all data and runs migrations)
+- `npm run db:migrate --workspaces=false`: Run database migrations
+- `npm run db:seed --workspaces=false`: Seed database with test data
+
+> ⚠️ **Note**: Database scripts require the `--workspaces=false` flag to avoid workspace-related errors.
+
+## Documentation
+
+- [Development Setup Guide](docs/development-setup.md) - Detailed setup instructions and troubleshooting
+- [System Design](docs/system-design.md) - Architecture and system design documentation
+- [MVP Implementation](docs/mvp-implementation.md) - MVP features and implementation details
 
 ## License
 
