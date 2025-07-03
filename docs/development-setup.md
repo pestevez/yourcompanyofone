@@ -27,14 +27,17 @@ The project uses PostgreSQL for data storage, running in a Docker container.
 
 ```bash
 # Start the PostgreSQL container
-npm run db:up
+npm run db:up --workspaces=false
 
 # Run database migrations
-npm run db:migrate
+npm run db:migrate --workspaces=false
 
 # Seed the database with test data
-npm run db:seed
+npm run db:seed --workspaces=false
 ```
+
+> **Note:**
+> If you see errors about missing scripts in workspaces, add the `--workspaces=false` flag to your npm commands (e.g., `npm run db:up --workspaces=false`). This ensures the script runs only in the root and not in every workspace package.
 
 ### Available Database Commands
 
@@ -120,13 +123,19 @@ The development environment uses Docker Compose to manage services:
    - Check if the PostgreSQL container is running: `docker ps`
    - Verify the database URL in `.env` matches the Docker configuration
 
-2. **Reset Database**
-   If you need to start fresh:
+2. **Workspace Script Errors**
+   If you see errors about missing scripts in workspaces when running npm commands, add the `--workspaces=false` flag. For example:
    ```bash
-   npm run db:reset
+   npm run db:up --workspaces=false
    ```
 
-3. **Workspace Dependencies**
+3. **Reset Database**
+   If you need to start fresh:
+   ```bash
+   npm run db:reset --workspaces=false
+   ```
+
+4. **Workspace Dependencies**
    If you encounter workspace dependency issues:
    ```bash
    # Clean install dependencies
