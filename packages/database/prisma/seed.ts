@@ -55,7 +55,7 @@ async function main() {
               email: 'admin@system.com',
               name: 'System Admin',
               authProvider: AuthProvider.EMAIL_PASSWORD,
-              password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu.Vm', // "admin123"
+              password: '$2b$10$YP9VdWcVHoj.TwIpHGV7h.lU4jl4Tthkt7cx2FUV0bXnO8kEAvw.q', // "admin123"
             },
           },
           role: 'ADMIN',
@@ -79,7 +79,7 @@ async function main() {
               email: 'user@client.com',
               name: 'Client User',
               authProvider: AuthProvider.EMAIL_PASSWORD,
-              password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu.Vm', // "admin123"
+              password: '$2b$10$YP9VdWcVHoj.TwIpHGV7h.lU4jl4Tthkt7cx2FUV0bXnO8kEAvw.q', // "admin123"
             },
           },
           role: 'MEMBER',
@@ -103,7 +103,7 @@ async function main() {
               email: 'user@payingclient.com',
               name: 'Paying Client User',
               authProvider: AuthProvider.EMAIL_PASSWORD,
-              password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu.Vm', // "admin123"
+              password: '$2b$10$YP9VdWcVHoj.TwIpHGV7h.lU4jl4Tthkt7cx2FUV0bXnO8kEAvw.q', // "admin123"
             },
           },
           role: 'MEMBER',
