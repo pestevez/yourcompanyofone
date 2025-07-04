@@ -187,6 +187,121 @@ curl -X POST http://localhost:3001/organizations/ORG_ID/members \
   -d '{"email": "user@client.com", "role": "MEMBER"}'
 ```
 
+## Frontend Setup
+
+### Environment Variables
+
+The frontend requires environment variables to be configured. Create a `.env.local` file in `apps/web/`:
+
+```bash
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+### Starting the Frontend
+
+```bash
+# Start the frontend in development mode
+cd apps/web
+npm run dev
+```
+
+The frontend will be available at:
+- **Web App**: http://localhost:3000
+
+### Testing the Frontend
+
+1. **Authentication Flow**:
+   - Navigate to http://localhost:3000
+   - Click "Sign In" and use test credentials
+   - You should be redirected to the dashboard
+
+2. **Organization Management**:
+   - After login, you'll see your organization information
+   - Use the "Create Organization" button to create new organizations
+   - Navigate to "Organizations" in the sidebar to manage organizations and members
+
+3. **Organization Switching**:
+   - If you have multiple organizations, use the dropdown in the header to switch between them
+
+### Frontend Features
+
+#### Dashboard
+- Organization overview with plan details
+- Quick actions for common tasks
+- Recent activity section
+- Organization switching (if multiple organizations)
+
+#### Organizations Management
+- List all user's organizations
+- Create new organizations
+- View organization details (members, content count, platforms)
+- Add/remove members with role assignment
+- Delete organizations (with safety checks)
+
+#### Authentication
+- Login/Register pages
+- JWT token management
+- Protected routes
+- Automatic redirect to login for unauthenticated users
+
+### Starting the API
+
+```bash
+# Start the API in development mode
+cd apps/api
+npm run start:dev
+```
+
+The API will be available at:
+- **API**: http://localhost:3001
+- **Documentation**: http://localhost:3001/api
+
+### Testing the API
+
+You can test the authentication endpoints:
+
+```bash
+# Login
+curl -X POST http://localhost:3001/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@system.com","password":"admin123"}'
+
+# Register
+curl -X POST http://localhost:3001/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"new@example.com","password":"password123","name":"New User"}'
+```
+
+#### Testing Organization Management
+
+```bash
+# Login and get JWT token
+TOKEN=$(curl -s -X POST http://localhost:3001/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@system.com","password":"admin123"}' | jq -r '.access_token')
+
+# List organizations
+curl -X GET http://localhost:3001/organizations \
+  -H "Authorization: Bearer $TOKEN"
+
+# Create new organization
+curl -X POST http://localhost:3001/organizations \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test Organization"}'
+
+# Get organization details
+curl -X GET http://localhost:3001/organizations/ORG_ID \
+  -H "Authorization: Bearer $TOKEN"
+
+# Add member to organization
+curl -X POST http://localhost:3001/organizations/ORG_ID/members \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@client.com", "role": "MEMBER"}'
+```
+
 ## Development Environment
 
 ### Environment Variables
@@ -205,6 +320,42 @@ The development environment uses Docker Compose to manage services:
 - **API**: Runs on port 3001
 - **Web**: Runs on port 3000
 
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests for specific workspace
+npm test --workspace=apps/web
+npm test --workspace=apps/api
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+### Test Coverage
+
+The project includes comprehensive test coverage:
+
+#### Frontend Tests (`apps/web/`)
+- **Authentication Context**: Tests for login, register, and logout functionality
+- **API Client**: Tests for all API endpoints with proper mocking
+- **Dashboard**: Tests for organization display and user interaction
+- **Component Tests**: Tests for React components with proper context mocking
+
+#### Backend Tests (`apps/api/`)
+- **Authentication**: Tests for login, register, and profile endpoints
+- **Organization Management**: Tests for CRUD operations and member management
+- **Authorization**: Tests for role-based access control
+- **Validation**: Tests for DTO validation and error handling
+
+### Test Data
+
+Tests use the same seed data as development, ensuring consistency across environments.
+
 ## Current Implementation Status
 
 ### ✅ Completed Features
@@ -213,15 +364,16 @@ The development environment uses Docker Compose to manage services:
 - **API Documentation**: Swagger UI available at `/api`
 - **Test Data**: Seeded database with working credentials
 - **Monorepo Structure**: Properly organized with apps and packages
+- **Frontend Implementation**: Complete Next.js app with authentication and organization management
+- **Organization Management**: Complete CRUD operations and member management (backend + frontend)
+- **State Management**: Optimized React Context with useCallback to prevent infinite loops
+- **Testing**: Comprehensive test coverage for all major features
 
-### 🚧 In Progress
-- **Frontend Implementation**: Next.js app structure ready
-- **Organization Management**: ✅ Complete CRUD operations and member management
-
-### 📋 Planned Features
+### 📋 Next Phase: Platform Integration & Content Management
 - **Content Management**: CRUD operations for social media content
-- **Platform Integration**: Social media API connections
+- **Platform Integration**: Social media API connections (Twitter, LinkedIn, etc.)
 - **Workflow Engine**: Inngest workflows for automation
+- **Analytics**: Content performance tracking and reporting
 
 ## Troubleshooting
 

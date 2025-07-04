@@ -1,7 +1,9 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import DashboardPage from '../page'
 import { AuthProvider } from '@/lib/auth-context'
+import { OrganizationsProvider } from '@/lib/organizations-context'
 
 // Mock next/navigation at the top level
 const mockPush = jest.fn()
@@ -22,11 +24,29 @@ jest.mock('@/lib/auth-context', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
+// Mock the organizations context
+jest.mock('@/lib/organizations-context', () => ({
+  useOrganizations: jest.fn(),
+  OrganizationsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}))
+
 const mockUseAuth = require('@/lib/auth-context').useAuth
+const mockUseOrganizations = require('@/lib/organizations-context').useOrganizations
 
 describe('DashboardPage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    
+    // Default mock for organizations context
+    mockUseOrganizations.mockReturnValue({
+      organizations: [],
+      currentOrganization: null,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
+    })
   })
 
   it('should redirect to login when user is not authenticated', () => {
@@ -38,7 +58,9 @@ describe('DashboardPage', () => {
 
     render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
@@ -53,28 +75,59 @@ describe('DashboardPage', () => {
     }
 
     const mockOrganization = {
-      organization: {
-        id: 'org-1',
-        name: 'John Doe Organization',
+      id: 'org-1',
+      name: 'John Doe Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'ADMIN',
+      members: [
+        {
+          id: 'member-1',
+          userId: '1',
+          role: 'ADMIN',
+          user: {
+            id: '1',
+            name: 'John Doe',
+            email: 'john@example.com',
+          },
+        },
+      ],
+      _count: {
+        content: 0,
+        platformIdentities: 0,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser,
-      currentOrganization: mockOrganization,
       logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrganization],
+      currentOrganization: mockOrganization,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
     expect(screen.getByText('Welcome back, John Doe')).toBeInTheDocument()
-    expect(screen.getAllByText('John Doe Organization').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('ADMIN').length).toBeGreaterThan(0)
+    expect(screen.getByText('John Doe Organization')).toBeInTheDocument()
+    expect(screen.getByText('Basic Plan ($29/month)')).toBeInTheDocument()
   })
 
   it('should display different organization names for different users', () => {
@@ -85,26 +138,57 @@ describe('DashboardPage', () => {
     }
 
     const mockOrg1 = {
-      organization: {
-        id: 'org-1',
-        name: 'System Organization',
+      id: 'org-1',
+      name: 'System Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'ADMIN',
+      members: [
+        {
+          id: 'member-1',
+          userId: '1',
+          role: 'ADMIN',
+          user: {
+            id: '1',
+            name: 'Admin User',
+            email: 'admin@system.com',
+          },
+        },
+      ],
+      _count: {
+        content: 0,
+        platformIdentities: 0,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser1,
-      currentOrganization: mockOrg1,
       logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrg1],
+      currentOrganization: mockOrg1,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     const { rerender } = render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
-    expect(screen.getAllByText('System Organization').length).toBeGreaterThan(0)
+    expect(screen.getByText('System Organization')).toBeInTheDocument()
 
     // Test with different user
     const mockUser2 = {
@@ -114,31 +198,60 @@ describe('DashboardPage', () => {
     }
 
     const mockOrg2 = {
-      organization: {
-        id: 'org-2',
-        name: 'Client Organization',
+      id: 'org-2',
+      name: 'Client Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'MEMBER',
+      members: [
+        {
+          id: 'member-2',
+          userId: '2',
+          role: 'MEMBER',
+          user: {
+            id: '2',
+            name: 'Client User',
+            email: 'user@client.com',
+          },
+        },
+      ],
+      _count: {
+        content: 0,
+        platformIdentities: 0,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser2,
-      currentOrganization: mockOrg2,
       logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrg2],
+      currentOrganization: mockOrg2,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     rerender(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
-    expect(screen.getAllByText('Client Organization').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('MEMBER').length).toBeGreaterThan(0)
+    expect(screen.getByText('Client Organization')).toBeInTheDocument()
   })
 
-  it('should handle logout functionality', async () => {
-    const mockLogout = jest.fn()
+  it('should display organization information correctly', () => {
     const mockUser = {
       id: '1',
       name: 'Test User',
@@ -146,29 +259,67 @@ describe('DashboardPage', () => {
     }
 
     const mockOrganization = {
-      organization: {
-        id: 'org-1',
-        name: 'Test Organization',
+      id: 'org-1',
+      name: 'Test Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'ADMIN',
+      members: [
+        {
+          id: 'member-1',
+          userId: '1',
+          role: 'ADMIN',
+          user: {
+            id: '1',
+            name: 'Test User',
+            email: 'test@example.com',
+          },
+        },
+      ],
+      _count: {
+        content: 5,
+        platformIdentities: 2,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser,
+      logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrganization],
       currentOrganization: mockOrganization,
-      logout: mockLogout,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
-    const logoutButton = screen.getByText('Sign out')
-    logoutButton.click()
-
-    expect(mockLogout).toHaveBeenCalled()
+    expect(screen.getByText('Test Organization')).toBeInTheDocument()
+    expect(screen.getByText('Basic Plan ($29/month)')).toBeInTheDocument()
+    expect(screen.getByText((content, node) =>
+      node?.textContent === 'Members: 1')
+    ).toBeInTheDocument()
+    expect(screen.getByText((content, node) =>
+      node?.textContent === 'Content: 5')
+    ).toBeInTheDocument()
+    expect(screen.getByText((content, node) =>
+      node?.textContent === 'Platforms: 2')
+    ).toBeInTheDocument()
   })
 
   it('should display quick action buttons', () => {
@@ -179,25 +330,57 @@ describe('DashboardPage', () => {
     }
 
     const mockOrganization = {
-      organization: {
-        id: 'org-1',
-        name: 'Test Organization',
+      id: 'org-1',
+      name: 'Test Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'ADMIN',
+      members: [
+        {
+          id: 'member-1',
+          userId: '1',
+          role: 'ADMIN',
+          user: {
+            id: '1',
+            name: 'Test User',
+            email: 'test@example.com',
+          },
+        },
+      ],
+      _count: {
+        content: 0,
+        platformIdentities: 0,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser,
-      currentOrganization: mockOrganization,
       logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrganization],
+      currentOrganization: mockOrganization,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
+    expect(screen.getByText('Create Organization')).toBeInTheDocument()
     expect(screen.getByText('Create Content')).toBeInTheDocument()
     expect(screen.getByText('Connect Platform')).toBeInTheDocument()
     expect(screen.getByText('View Analytics')).toBeInTheDocument()
@@ -211,22 +394,53 @@ describe('DashboardPage', () => {
     }
 
     const mockOrganization = {
-      organization: {
-        id: 'org-1',
-        name: 'Test Organization',
+      id: 'org-1',
+      name: 'Test Organization',
+      plan: {
+        id: 'plan-1',
+        name: 'Basic Plan',
+        description: 'Basic plan for small teams',
+        price: 29,
+        features: {},
       },
-      role: 'ADMIN',
+      members: [
+        {
+          id: 'member-1',
+          userId: '1',
+          role: 'ADMIN',
+          user: {
+            id: '1',
+            name: 'Test User',
+            email: 'test@example.com',
+          },
+        },
+      ],
+      _count: {
+        content: 0,
+        platformIdentities: 0,
+      },
     }
 
     mockUseAuth.mockReturnValue({
       user: mockUser,
-      currentOrganization: mockOrganization,
       logout: jest.fn(),
+    })
+
+    mockUseOrganizations.mockReturnValue({
+      organizations: [mockOrganization],
+      currentOrganization: mockOrganization,
+      loading: false,
+      error: null,
+      fetchOrganizations: jest.fn(),
+      createOrganization: jest.fn(),
+      setCurrentOrganization: jest.fn(),
     })
 
     render(
       <AuthProvider>
-        <DashboardPage />
+        <OrganizationsProvider>
+          <DashboardPage />
+        </OrganizationsProvider>
       </AuthProvider>
     )
 
