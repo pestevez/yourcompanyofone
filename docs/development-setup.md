@@ -158,6 +158,35 @@ curl -X POST http://localhost:3001/auth/register \
   -d '{"email":"new@example.com","password":"password123","name":"New User"}'
 ```
 
+#### Testing Organization Management
+
+```bash
+# Login and get JWT token
+TOKEN=$(curl -s -X POST http://localhost:3001/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@system.com","password":"admin123"}' | jq -r '.access_token')
+
+# List organizations
+curl -X GET http://localhost:3001/organizations \
+  -H "Authorization: Bearer $TOKEN"
+
+# Create new organization
+curl -X POST http://localhost:3001/organizations \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test Organization"}'
+
+# Get organization details
+curl -X GET http://localhost:3001/organizations/ORG_ID \
+  -H "Authorization: Bearer $TOKEN"
+
+# Add member to organization
+curl -X POST http://localhost:3001/organizations/ORG_ID/members \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@client.com", "role": "MEMBER"}'
+```
+
 ## Development Environment
 
 ### Environment Variables
@@ -187,7 +216,7 @@ The development environment uses Docker Compose to manage services:
 
 ### 🚧 In Progress
 - **Frontend Implementation**: Next.js app structure ready
-- **Organization Management**: API endpoints to be implemented
+- **Organization Management**: ✅ Complete CRUD operations and member management
 
 ### 📋 Planned Features
 - **Content Management**: CRUD operations for social media content
