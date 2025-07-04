@@ -50,25 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await authAPI.login(email, password)
       localStorage.setItem('access_token', response.access_token)
       
-      // TODO: Fetch user data from backend
-      // For now, we'll create a mock user
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: email.split('@')[0],
-        organizations: [
-          {
-            organization: {
-              id: 'org-1',
-              name: 'My Organization',
-            },
-            role: 'ADMIN',
-          },
-        ],
-      }
-      
-      setUser(mockUser)
-      setCurrentOrganization(mockUser.organizations[0])
+      // Fetch user data from backend
+      const userData = await authAPI.getProfile()
+      setUser(userData)
+      setCurrentOrganization(userData.organizations[0])
     } catch (error) {
       console.error('Login error:', error)
       throw error
@@ -80,24 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await authAPI.register(email, password, name)
       localStorage.setItem('access_token', response.access_token)
       
-      // TODO: Fetch user data from backend
-      const mockUser: User = {
-        id: '1',
-        email,
-        name,
-        organizations: [
-          {
-            organization: {
-              id: 'org-1',
-              name: `${name}'s Organization`,
-            },
-            role: 'ADMIN',
-          },
-        ],
-      }
-      
-      setUser(mockUser)
-      setCurrentOrganization(mockUser.organizations[0])
+      // The register endpoint already returns user data
+      setUser(response)
+      setCurrentOrganization(response.organizations[0])
     } catch (error) {
       console.error('Register error:', error)
       throw error
