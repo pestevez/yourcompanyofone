@@ -6,6 +6,7 @@ const mockAxiosInstance = {
   post: jest.fn(),
   get: jest.fn(),
   put: jest.fn(),
+  patch: jest.fn(),
   delete: jest.fn(),
   interceptors: {
     request: { use: jest.fn() },
@@ -105,42 +106,97 @@ describe('API Client', () => {
 
   describe('organizationsAPI', () => {
     it('should call list organizations endpoint', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ data: [{ id: '1', name: 'Org 1' }] })
-      await organizationsAPI.list()
+      const mockResponse = [
+        {
+          id: '1',
+          name: 'Org 1',
+          plan: { name: 'Free', price: 0 },
+          members: [],
+          _count: { content: 0, platformIdentities: 0 },
+        },
+      ]
+      mockAxiosInstance.get.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.list()
       expect(mockAxiosInstance.get).toHaveBeenCalledWith('/organizations')
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call get organization endpoint with correct ID', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ data: { id: '1', name: 'Org 1' } })
-      await organizationsAPI.get('org-1')
+      const mockResponse = {
+        id: '1',
+        name: 'Org 1',
+        plan: { name: 'Free', price: 0 },
+        members: [],
+        _count: { content: 0, platformIdentities: 0 },
+      }
+      mockAxiosInstance.get.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.get('org-1')
       expect(mockAxiosInstance.get).toHaveBeenCalledWith('/organizations/org-1')
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call create organization endpoint with correct data', async () => {
-      mockAxiosInstance.post.mockResolvedValue({ data: { id: '1', name: 'New Org' } })
-      await organizationsAPI.create({ name: 'New Org' })
+      const mockResponse = {
+        id: '1',
+        name: 'New Org',
+        plan: { name: 'Free', price: 0 },
+        members: [],
+      }
+      mockAxiosInstance.post.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.create({ name: 'New Org' })
       expect(mockAxiosInstance.post).toHaveBeenCalledWith('/organizations', {
         name: 'New Org',
       })
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call update organization endpoint with correct data', async () => {
-      mockAxiosInstance.put.mockResolvedValue({ data: { id: '1', name: 'Updated Org' } })
-      await organizationsAPI.update('org-1', { name: 'Updated Org' })
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/organizations/org-1', {
+      const mockResponse = {
+        id: '1',
+        name: 'Updated Org',
+        plan: { name: 'Free', price: 0 },
+        members: [],
+      }
+      mockAxiosInstance.patch.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.update('org-1', { name: 'Updated Org' })
+      expect(mockAxiosInstance.patch).toHaveBeenCalledWith('/organizations/org-1', {
         name: 'Updated Org',
       })
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should call delete organization endpoint with correct ID', async () => {
+      const mockResponse = { message: 'Organization deleted successfully' }
+      mockAxiosInstance.delete.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.delete('org-1')
+      expect(mockAxiosInstance.delete).toHaveBeenCalledWith('/organizations/org-1')
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call get members endpoint with correct organization ID', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ data: [{ id: '1', name: 'Member 1' }] })
-      await organizationsAPI.getMembers('org-1')
+      const mockResponse = [
+        {
+          id: '1',
+          userId: 'user-1',
+          role: 'ADMIN',
+          user: { id: 'user-1', name: 'Member 1', email: 'member@example.com' },
+        },
+      ]
+      mockAxiosInstance.get.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.getMembers('org-1')
       expect(mockAxiosInstance.get).toHaveBeenCalledWith('/organizations/org-1/members')
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call add member endpoint with correct data', async () => {
-      mockAxiosInstance.post.mockResolvedValue({ data: { id: '1', email: 'member@example.com' } })
-      await organizationsAPI.addMember('org-1', {
+      const mockResponse = {
+        id: '1',
+        userId: 'user-1',
+        role: 'MEMBER',
+        user: { id: 'user-1', name: 'New Member', email: 'member@example.com' },
+      }
+      mockAxiosInstance.post.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.addMember('org-1', {
         email: 'member@example.com',
         role: 'MEMBER',
       })
@@ -148,6 +204,15 @@ describe('API Client', () => {
         email: 'member@example.com',
         role: 'MEMBER',
       })
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should call remove member endpoint with correct data', async () => {
+      const mockResponse = { message: 'Member removed successfully' }
+      mockAxiosInstance.delete.mockResolvedValue({ data: mockResponse })
+      const result = await organizationsAPI.removeMember('org-1', 'member-1')
+      expect(mockAxiosInstance.delete).toHaveBeenCalledWith('/organizations/org-1/members/member-1')
+      expect(result).toEqual(mockResponse)
     })
   })
 }) 

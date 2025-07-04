@@ -68,7 +68,7 @@ export const authAPI = {
   },
 }
 
-// Organizations API (to be implemented)
+// Organizations API
 export const organizationsAPI = {
   list: async () => {
     const response = await getApi().get('/organizations')
@@ -85,8 +85,13 @@ export const organizationsAPI = {
     return response.data
   },
   
-  update: async (id: string, data: { name: string }) => {
-    const response = await getApi().put(`/organizations/${id}`, data)
+  update: async (id: string, data: { name?: string }) => {
+    const response = await getApi().patch(`/organizations/${id}`, data)
+    return response.data
+  },
+  
+  delete: async (id: string) => {
+    const response = await getApi().delete(`/organizations/${id}`)
     return response.data
   },
   
@@ -97,6 +102,11 @@ export const organizationsAPI = {
   
   addMember: async (organizationId: string, data: { email: string; role: string }) => {
     const response = await getApi().post(`/organizations/${organizationId}/members`, data)
+    return response.data
+  },
+  
+  removeMember: async (organizationId: string, memberId: string) => {
+    const response = await getApi().delete(`/organizations/${organizationId}/members/${memberId}`)
     return response.data
   },
 } 

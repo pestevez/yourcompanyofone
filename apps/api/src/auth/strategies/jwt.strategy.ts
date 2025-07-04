@@ -33,7 +33,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       return null;
     }
 
-    const { password, ...result } = user;
-    return result;
+    // Return the payload with user data for backward compatibility
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      organizationId: payload.organizationId,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        organizations: user.organizations,
+      },
+    };
   }
 } 
