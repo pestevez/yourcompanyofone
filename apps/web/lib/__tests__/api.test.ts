@@ -24,28 +24,82 @@ describe('API Client', () => {
 
   describe('authAPI', () => {
     it('should call login endpoint with correct data', async () => {
-      mockAxiosInstance.post.mockResolvedValue({ data: { access_token: 'mock-token' } })
-      await authAPI.login('test@example.com', 'password')
+      const mockResponse = {
+        access_token: 'mock-token',
+        user: {
+          id: '1',
+          email: 'test@example.com',
+          name: 'Test User',
+          organizations: [
+            {
+              organization: {
+                id: 'org-1',
+                name: 'Test Organization',
+              },
+              role: 'ADMIN',
+            },
+          ],
+        },
+      }
+      mockAxiosInstance.post.mockResolvedValue({ data: mockResponse })
+      
+      const result = await authAPI.login('test@example.com', 'password')
+      
       expect(mockAxiosInstance.post).toHaveBeenCalledWith('/auth/login', {
         email: 'test@example.com',
         password: 'password',
       })
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call register endpoint with correct data', async () => {
-      mockAxiosInstance.post.mockResolvedValue({ data: { access_token: 'mock-token' } })
-      await authAPI.register('test@example.com', 'password', 'Test User')
+      const mockResponse = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+        organizations: [
+          {
+            organization: {
+              id: 'org-1',
+              name: "Test User's Organization",
+            },
+            role: 'ADMIN',
+          },
+        ],
+      }
+      mockAxiosInstance.post.mockResolvedValue({ data: mockResponse })
+      
+      const result = await authAPI.register('test@example.com', 'password', 'Test User')
+      
       expect(mockAxiosInstance.post).toHaveBeenCalledWith('/auth/register', {
         email: 'test@example.com',
         password: 'password',
         name: 'Test User',
       })
+      expect(result).toEqual(mockResponse)
     })
 
     it('should call getProfile endpoint', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ data: { id: '1', name: 'Test User' } })
-      await authAPI.getProfile()
+      const mockResponse = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+        organizations: [
+          {
+            organization: {
+              id: 'org-1',
+              name: 'Test Organization',
+            },
+            role: 'ADMIN',
+          },
+        ],
+      }
+      mockAxiosInstance.get.mockResolvedValue({ data: mockResponse })
+      
+      const result = await authAPI.getProfile()
+      
       expect(mockAxiosInstance.get).toHaveBeenCalledWith('/auth/profile')
+      expect(result).toEqual(mockResponse)
     })
   })
 
